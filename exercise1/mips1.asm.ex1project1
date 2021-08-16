@@ -1,0 +1,95 @@
+#Students: Itamar Cohen & Maor Moshe
+#ID:	   318558236	& 211390877
+#Assembly
+#Exercise 1 Project 1
+.data
+arr1: .align 2
+      .space 4000
+arr2: .align 2
+      .space 4000
+first: .word 0
+last: .word 0
+msg1: .asciiz "Enter first location: "
+msg2: .asciiz "Enter last location: "
+msg3: .asciiz "Sum = "
+msg4: .asciiz "\nCount = "
+.text
+
+#saving 10, 20, 30, ... 500 in arr1
+	li	 $t0, 10		#$t0 = value
+	la 	 $t1, arr1		#$t1 = pointer to arr1
+loop:	sw	 $t0,0($t1)		#saving value of $t0 in arr1
+	addi	 $t0,$t0, 10		#$t0+=10
+	addi	 $t1,$t1, 4		#$t1+=4 increasing the pointer by 1 word
+	beq 	 $t0, 510, sofLoop	#checking if to end the loop
+	j 	 loop
+sofLoop:
+
+#reading first and last
+	li $v0, 4     
+	la $a0, msg1
+	syscall	#prints first message 
+
+	la $t1, first	 #$t1 pointer to first
+	li $v0, 5
+	syscall		 #reading integer
+	sw $v0, 0($t1)   #save first number
+	
+	li $v0, 4  
+	la $a0, msg2
+	syscall	#prints second message 
+	
+	la $t1, last 	 #$t1 pointer to last
+	li $v0, 5	 
+	syscall		 #reading integer
+	sw $v0, 0($t1)	 #save last number
+	
+#calculating count:
+	la $t0, first #$t0 points to first
+	lw $t1, 0($t0)#$t1=first
+	
+	la $t0, last#$t0 points to last
+	lw $t2, 0($t0)#$t2=last
+	
+	add $t7, $t2, $zero #$t7=last
+	sub $t7, $t7, $t1 #$t7-=first
+	addi $t7, $t7, 1 #$t7++. #t7=count
+
+#saving $t0 as pointer to arr1[first]:
+	la $t0, arr1 #$t0 points to arr1
+addPointer:	beq $t1, 1, stop #if first = 1 stop
+	addi $t0, $t0, 4 #increase pointer by 1 word
+	subi $t1, $t1, 1#first--
+	j addPointer
+stop:
+
+#copy to arr2 and calculating sum:
+	la $t1, arr2 #$t1 points to arr2, $t0 points to first at arr1
+	add $t3, $t7, $zero #$t3 = $t7 = count
+	li $t2, 0 #$t2 = 0, $t2 is sum
+copy: 	beq $t3, 0, stopcopy#if count == 0 end copy
+	lw $t4, 0($t0)#$t4 = arr1[$t0], value
+	add $t2, $t2, $t4#sum += $t4
+	sw $t4, 0($t1)#copy number to arr2
+	addi $t0, $t0, 4#$t0++
+	addi $t1, $t1, 4#$t1++
+	subi $t3, $t3, 1#count--
+	j copy
+stopcopy:
+
+#printing information:
+	li $v0, 4  
+	la $a0, msg3
+	syscall	#prints third message 
+	
+	li $v0, 1
+	add $a0, $t2, $zero 
+	syscall #prints the sum
+	
+	li $v0, 4  
+	la $a0, msg4
+	syscall	#prints fourth message 
+	
+	li $v0, 1
+	add $a0, $t7, $zero 
+	syscall #prints the count

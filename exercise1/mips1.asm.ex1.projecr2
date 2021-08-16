@@ -1,0 +1,43 @@
+#Students: Itamar Cohen & Maor Moshe
+#ID:	   318558236	& 211390877
+#Assembly
+#Exercise 1 Project 2
+.data
+msg1: .asciiz "Enter two digits number: "
+msg2: .asciiz "sum = "
+.text
+	li $t0, 0	#$t0 = sum
+	
+read: 	
+	la $a0, msg1
+	li $v0, 4
+	syscall #print first message
+
+	li $v0, 5
+	syscall	#reading integer
+	
+	add $t1, $v0, $zero #$t1 = value
+	beq $t1, 0, stopReading
+	
+	li $t3, 100
+	slt $t2, $t1, $t3  	#checking if value > 99
+	beq $t2, $zero, read
+	
+	li $t3, -99
+	slt $t2, $t1, $t3 	#checking if value < -99
+	beq $t2, 1, read
+	
+	add $t0, $t0, $t1 	#sum += value
+	
+	j read
+	
+stopReading:
+	la $a0, msg2
+	li $v0, 4
+	syscall #print first message
+	
+	add $a0, $t0, $zero
+	li $v0, 1
+	syscall 	#print sum
+	
+	
